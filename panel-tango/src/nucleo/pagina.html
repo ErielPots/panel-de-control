@@ -1,0 +1,52 @@
+<title>Panel de control Tango</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap">
+<style>
+/*{{ESTILOS}}*/
+</style>
+
+
+<header class="top gut">
+  <div class="wrap">
+    <div class="brand">TANGO MOTORS</div>
+    <div class="tabs" role="tablist" aria-label="Solapas">
+      <button type="button" role="tab" data-tab="panel" aria-selected="true">Panel</button>
+      <button type="button" role="tab" data-tab="estados" aria-selected="false">Estados contables</button>
+    </div>
+    <nav class="secs" id="secs" aria-label="Secciones"></nav>
+    <div class="yearpick"><label>Año</label><div class="seg" id="years" role="group" aria-label="Año"></div></div>
+  </div>
+</header>
+
+<div class="cluster gut">
+  <div class="wrap">
+    <div class="cl-head">
+      <h1 id="hero">Panel de control <em>año 6</em></h1>
+      <div class="legend-sem"><span><i style="background:var(--b-good)"></i>1º y 2º</span><span><i style="background:var(--b-warn)"></i>3º y 4º</span><span><i style="background:var(--b-bad)"></i>5º y 6º</span></div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+</div>
+
+<div class="shell wrap gut">
+<aside class="side" id="side" aria-label="Secciones"></aside>
+<main>
+<div class="view" id="v-panel">
+<!--{{SECCIONES_PANEL}}-->
+</div>
+
+<div class="view" id="v-estados" hidden>
+<!--{{SECCIONES_ESTADOS}}-->
+</div>
+</main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<script>
+window.__DATOS__ = /*{{DATOS}}*/null;
+</script>
+<script>
+/*{{SCRIPTS}}*/
+</script>
