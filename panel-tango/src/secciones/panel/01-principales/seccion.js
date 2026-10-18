@@ -11,14 +11,11 @@ function principales() {
   set('c_marg', { ...base({ grid: { right: 52 } }), tooltip: lineTT(tip(1, '%')), xAxis: xCat(X), yAxis: yVal('%'),
     series: [ml('Bruto', 'mb', C.t3, 2), ml('Operativo', 'mo', C.t2, 2), { ...ml('Neto', 'ros', C.t1, 3), areaStyle: areaGrad(C.t2) }] });
 
-  // market share: barra 100% por año; TANGO abajo y sólido, rivales en su color atenuado
-  const ordE = [T, ...E.map((_, k) => k).filter(k => k !== T)];
-  set('c_ms', { ...base(), tooltip: { ...base().tooltip, formatter: (ps) => { const i = ps[0].dataIndex; return `<b>${X[i]}</b><br>` + ordE.map(k => ({ k, v: RD[i].ms[k] })).sort((a, b) => b.v - a.v).map(o => `${dot(C.emp[E[o.k]])}${o.k === T ? '<b>' : ''}${E[o.k]} ${F(o.v, 1)}%${o.k === T ? '</b>' : ''}`).join('<br>'); } },
-    xAxis: xCat(X), yAxis: yVal('%', { max: 100, interval: 25 }),
-    series: ordE.map((k, j) => ({ type: 'bar', name: E[k], stack: 'ms', barWidth: '64%', data: serie(dd => dd.ms[k]),
-      itemStyle: { color: k === T ? grad(C.tango, 1, .82) : hexA(C.emp[E[k]], .45), borderColor: C.card, borderWidth: 1.5, borderRadius: j === ordE.length - 1 ? [5, 5, 0, 0] : 0 },
-      label: { show: true, position: 'inside', fontSize: k === T ? 12 : 9.5, fontWeight: k === T ? 800 : 500, color: k === T ? '#ffffff' : C.ink, formatter: (p) => F(p.value, k === T ? 1 : 0) },
-      emphasis: { focus: 'series' }, animationDelay: (i) => i * 70 + j * 40 })) });
+  // market share anual: sólo la evolución de TANGO contra el promedio del mercado
+  set('c_ms', { ...base({ grid: { right: 52 } }), tooltip: lineTT(tip(1, '%')), xAxis: xCat(X), yAxis: yVal('%', { min: 0 }),
+    series: [line('TANGO', serie(dd => dd.ms[T]), C.own, { lineStyle: { width: 3, color: C.own }, symbolSize: 8, areaStyle: areaGrad(C.own), z: 4,
+      label: { show: true, position: 'top', color: C.ink, fontSize: 11, fontWeight: 700, formatter: (p) => F(p.value, 1) } }),
+      avgLine(serie(dd => avg(dd.ms)))] });
   document.getElementById('h_mspie').textContent = `Market share año ${y}`;
   const order = E.map((e, k) => k).sort((a, b) => d.ms[b] - d.ms[a]);
   set('c_mspie', pie(order.map(k => ({ name: E[k], value: d.ms[k] })), order.map(k => C.emp[E[k]]), 1, '%'));

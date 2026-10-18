@@ -31,4 +31,6 @@ Este repositorio arma el panel de control del equipo TANGO en el simulador autom
 - El TSR del simulador es anualizado desde el año 0; los dividendos capitalizados se despejan del TSR informado.
 - La referencia del mercado es el promedio de las seis empresas.
 - Los importes del informe vienen en miles de USD.
-- La utilización de planta es sobre la capacidad efectiva (las mejoras de proceso la recortan); la capacidad máxima es fábricas × 200 mil (EE.UU.) o 250 mil (China).
+- La utilización de planta es producción propia ÷ capacidad instalada, y la capacidad instalada es fábricas × 200 mil (EE.UU.) o 250 mil (China). En los años con mejoras de proceso da menos que la "capacidad empleada" del simulador, que se calcula sobre la capacidad ya recortada.
+- Demanda y producción: demanda + stock sobrante = producción + stock inicial + demanda insatisfecha (cierra exacto todos los años).
+- Nada se proyecta: todos los gráficos terminan en el último año con informe.

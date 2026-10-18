@@ -97,7 +97,7 @@ const delay = (i) => i * 55;
 const bar = (name, data, color, o = {}) => ({ type: 'bar', name, data, barMaxWidth: 28, itemStyle: { color: grad(color), borderRadius: [5, 5, 0, 0] }, emphasis: { itemStyle: { color } }, animationDelay: delay, ...o });
 const flat = (name, data, color, o = {}) => bar(name, data, color, { itemStyle: { color, borderRadius: 0 }, ...o });
 const line = (name, data, color, o = {}) => ({ type: 'line', name, data, smooth: .25, symbol: 'circle', symbolSize: 6, lineStyle: { width: 2, color }, itemStyle: { color, borderColor: C.card, borderWidth: 1.5 }, animationDelay: delay, ...o });
-const avgLine = (data, name = 'Promedio mercado') => line(name, data, C.avg, { lineStyle: { width: 1.5, type: [5, 4], color: C.avg }, symbol: 'none', z: 1 });
+const avgLine = (data, name = 'Promedio mercado') => line(name, data, C.avg, { lineStyle: { width: 2, type: [6, 4], color: C.avg, shadowColor: C.card, shadowBlur: 4 }, symbol: 'circle', symbolSize: 7, itemStyle: { color: C.card, borderColor: C.avg, borderWidth: 2 }, z: 6, zlevel: 0 });
 const lblTop = (d = 1, fmt) => ({ show: true, position: 'top', color: C['ink-2'], fontSize: 10.5, fontWeight: 600, formatter: fmt || ((p) => F(p.value, (d > 0 && Math.abs(p.value) < 1 && p.value !== 0) ? 2 : d)) });
 const tip = (d = 1, u = '') => ({ valueFormatter: (v) => v == null ? '–' : F(v, d) + u });
 const endLbl = (fmt) => ({ show: true, formatter: fmt, color: C.ink, fontSize: 11, fontWeight: 700, distance: 6 });
@@ -147,17 +147,7 @@ function countUp(el, to, dec) {
 function sem(rk) {
   if (rk == null) return '';
   const c = rk <= 2 ? 'g' : rk <= 4 ? 'y' : 'r';
-  return `<span class="sem" title="${rk}º de 6" aria-label="Puesto ${rk} de 6"><i class="${c === 'r' ? 'on r' : ''}"></i><i class="${c === 'y' ? 'on y' : ''}"></i><i class="${c === 'g' ? 'on g' : ''}"></i></span>`;
-}
-function spark(vals) {
-  const pts0 = vals.map((x, i) => x == null || isNaN(x) ? null : [i, x]).filter(Boolean);
-  if (pts0.length < 2) return '';
-  const ys = pts0.map(p => p[1]), lo = Math.min(...ys), hi = Math.max(...ys), W = 100, H = 30, p = 3;
-  const X = (i) => p + i * (W - 2 * p) / (vals.length - 1), Y = (x) => H - p - (hi === lo ? .5 : (x - lo) / (hi - lo)) * (H - 2 * p);
-  const pts = pts0.map(([i, x]) => [X(i), Y(x)]);
-  const d = pts.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' ');
-  const last = pts[pts.length - 1];
-  return `<svg class="sp" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7db4f5" stop-opacity=".35"/><stop offset="1" stop-color="#7db4f5" stop-opacity="0"/></linearGradient></defs><path d="${d} L${last[0].toFixed(1)} ${H} L${pts[0][0].toFixed(1)} ${H} Z" fill="url(#sg)"/><path d="${d}" fill="none" stroke="#7db4f5" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.4" fill="#eef3f9"/></svg>`;
+  return `<span class="sem" title="${rk}º de 6" aria-label="Puesto ${rk} de 6"><i class="${c === 'g' ? 'on g' : ''}"></i><i class="${c === 'y' ? 'on y' : ''}"></i><i class="${c === 'r' ? 'on r' : ''}"></i></span>`;
 }
 function kpis() {
   const y = st.y, d = RD[y], p = y > 0 ? RD[y - 1] : null;
@@ -173,7 +163,7 @@ function kpis() {
     { id: 'rt', k: 'Calificación', txt: true, f: dd => -RATING.indexOf(dd.rating[T]), all: d.rating.map(r => -RATING.indexOf(r)) },
   ];
   const box = document.getElementById('kpis');
-  if (!box.children.length) box.innerHTML = defs.map(o => `<div class="kpi"><div class="k"><span>${o.k}</span><span id="s_${o.id}"></span></div><div class="v"><span id="k_${o.id}"></span><small>${o.u || ''}</small></div><div class="d" id="d_${o.id}"></div><div id="p_${o.id}"></div></div>`).join('');
+  if (!box.children.length) box.innerHTML = defs.map(o => `<div class="kpi"><div class="k"><span>${o.k}</span><span id="s_${o.id}"></span></div><div class="v"><span id="k_${o.id}"></span><small>${o.u || ''}</small></div><div class="d" id="d_${o.id}"></div></div>`).join('');
   for (const o of defs) {
     const v = o.f(d), pv = p ? o.f(p) : null;
     const vEl = document.getElementById('k_' + o.id), dEl = document.getElementById('d_' + o.id);
@@ -181,16 +171,17 @@ function kpis() {
       vEl.textContent = d.rating[T];
       const pr = p && p.rating[T];
       dEl.className = 'd' + (pr && pr !== d.rating[T] ? (v > pv ? ' up' : ' dn') : '');
-      dEl.textContent = pr ? (pr === d.rating[T] ? `= año ${y - 1}` : `${v > pv ? '▲' : '▼'} desde ${pr}`) : '';
+      const esc = pr ? Math.abs(RATING.indexOf(pr) - RATING.indexOf(d.rating[T])) : 0;
+      dEl.textContent = !pr ? '' : esc === 0 ? '= sin cambios' : `${v > pv ? '▲' : '▼'} ${esc} ${esc === 1 ? 'escalón' : 'escalones'}`;
     } else {
       countUp(vEl, v, o.dec);
       let dv = null;
       if (pv != null) dv = o.pct ? (pv !== 0 ? (v - pv) / Math.abs(pv) * 100 : null) : v - pv;
-      dEl.className = 'd' + (dv == null ? '' : dv >= 0 ? ' up' : ' dn');
-      dEl.textContent = dv == null ? '' : `${dv >= 0 ? '▲' : '▼'} ${F(Math.abs(dv), 1)}${o.pct ? '%' : ' pp'} vs año ${y - 1}`;
+      const igual = dv != null && Math.abs(dv) < .05;
+      dEl.className = 'd' + (dv == null || igual ? '' : dv > 0 ? ' up' : ' dn');
+      dEl.textContent = dv == null ? '' : igual ? '= sin cambios' : `${dv > 0 ? '▲' : '▼'} ${F(Math.abs(dv), 1)}${o.pct ? '%' : ' pp'}`;
     }
     document.getElementById('s_' + o.id).innerHTML = sem(rank(o.all, T));
-    document.getElementById('p_' + o.id).innerHTML = spark(serie(dd => o.f(dd)));
   }
 }
 

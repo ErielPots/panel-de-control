@@ -96,15 +96,14 @@ nav.secs a.on { color: var(--b-ink); background: rgba(255,255,255,.06); }
 .legend-sem span { display: inline-flex; align-items: center; gap: 6px; }
 .legend-sem i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .kpis { display: grid; grid-template-columns: repeat(8, minmax(0,1fr)); gap: 10px; }
-.kpi { background: rgba(255,255,255,.045); border: 1px solid var(--b-line); border-radius: 12px; padding: 12px 12px 8px; display: grid; gap: 5px; min-width: 0; transition: background .2s, border-color .2s; }
+.kpi { background: rgba(255,255,255,.045); border: 1px solid var(--b-line); border-radius: 12px; padding: 13px 14px 12px; display: grid; gap: 6px; min-width: 0; transition: background .2s, border-color .2s; }
 .kpi:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.14); }
 .kpi .k { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 10.5px; color: var(--b-ink-2); text-transform: uppercase; letter-spacing: .09em; }
 .kpi .k > span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.kpi .v { font-family: var(--f-display); font-weight: 700; font-stretch: 92%; font-size: 27px; line-height: 1.05; white-space: nowrap; }
+.kpi .v { font-family: var(--f-display); font-weight: 700; font-stretch: 92%; font-size: 30px; line-height: 1.05; white-space: nowrap; }
 .kpi .v small { font-size: 12px; font-weight: 600; color: var(--b-ink-2); margin-left: 3px; }
-.kpi .d { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--b-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 15px; }
+.kpi .d { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--b-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 15px; }
 .kpi .d.up { color: var(--b-good); } .kpi .d.dn { color: var(--b-bad); }
-.kpi svg.sp { width: 100%; height: 30px; display: block; margin-top: 2px; }
 .sem { display: inline-flex; gap: 3px; padding: 3px 4px; border-radius: 99px; background: rgba(0,0,0,.35); flex: none; }
 .sem i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.13); display: block; transition: background .3s, box-shadow .3s; }
 .sem i.on.r { background: var(--b-bad); box-shadow: 0 0 6px var(--b-bad); }
