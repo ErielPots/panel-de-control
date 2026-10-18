@@ -23,7 +23,7 @@ Este repositorio arma el panel de control del equipo TANGO en el simulador autom
 - Color `C.own` (azul) para gráficos que muestran sólo a TANGO. Color `C.tango` (naranja) para TANGO frente a la competencia.
 - Colores de equipos fijos (`C.emp`): NOVA verde, RADAR rojo, SEVEN celeste, TANGO naranja, TCENA gris, NEXO marrón. El promedio y el rango del mercado van en gris azulado (`C.avg`, `C.band`).
 - Rojo (`C.bad`) sólo para lo negativo: pérdidas, deuda no planificada, caja bajo el piso.
-- Nunca mostrar seis líneas cruzadas de empresas: usar barras 100%, `bandChart` (TANGO sobre el rango del mercado) o un ranking.
+- Cuando un gráfico muestra a cada grupo por separado (retorno acumulado, precio por acción, dividendos, acciones en circulación), cada uno va en el color de su equipo y TANGO más grueso. Para indicadores donde las seis líneas se cruzan mucho, preferir `bandChart` (TANGO sobre el rango del mercado).
 - Las barras empiezan en cero.
 
 ## Convenciones de cálculo
