@@ -1,0 +1,4 @@
+panel-tango/dist/
+__pycache__/
+*.pyc
+.DS_Store

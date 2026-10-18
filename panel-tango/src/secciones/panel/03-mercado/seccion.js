@@ -36,13 +36,8 @@ function mercado() {
       bar('Líder', segs.map(o => Math.max(...o.m)), C.avg, { itemStyle: { color: grad(C.avg, .55, .4), borderRadius: [5,5,0,0] } }),
       line('Promedio', segs.map(o => avg(o.m.filter(v => v > 0))), C.ink, { symbol: 'rect', symbolSize: [20, 2.5], lineStyle: { opacity: 0 }, itemStyle: { color: C.ink }, smooth: false }),
     ] });
-  set('c_costo', { ...base(), tooltip: lineTT(tip(0, ' USD')), xAxis: xCat(X), yAxis: yVal('USD por unidad', { scale: true }),
-    series: [
-      line('Precio medio TANGO', serie(dd => precioMedio(dd, T)), C.t2, { lineStyle: { width: 3, color: C.t2 }, areaStyle: areaGrad(C.t2) }),
-      line('Costo TANGO', serie(dd => costoU(dd, T)), C.t1, { lineStyle: { width: 3, color: C.t1 }, symbol: 'rect' }),
-      avgLine(serie(dd => avg(allK(k => precioMedio(dd, k)))), 'Precio medio mercado'),
-      line('Costo mercado', serie(dd => avg(allK(k => costoU(dd, k)))), C.avg, { lineStyle: { width: 1.5, type: [2, 3], color: C.avg }, symbol: 'none' }),
-    ] });
+  // costo por unidad vendida: TANGO contra el rango y el promedio del mercado
+  bandChart('c_costo', (r, k) => costoU(RD[r], k), { d: 0, yName: 'USD por unidad', yOpts: { scale: true } });
 }
 
 function fixTec() { if (!segOk(st.reg, st.tec)) st.tec = Object.keys(TEC).find(t => segOk(st.reg, t)); }
