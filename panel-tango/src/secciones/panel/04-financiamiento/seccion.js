@@ -33,18 +33,16 @@ function financiamiento() {
     series: [bar('TANGO', serie(dd => MM(dd.dlp[T])), C.own, { label: lblTop(1) }), avgLine(serie(dd => MM(avg(dd.dlp))))] });
   set('c_dnpn', { ...base(), tooltip: { ...base().tooltip, ...tip(1, '%') }, xAxis: xCat(X), yAxis: yVal('%'),
     series: [bar('TANGO', serie(dd => ({ value: dd.dn_pn[T], itemStyle: { borderRadius: dd.dn_pn[T] < 0 ? [0, 0, 5, 5] : [5, 5, 0, 0] } })), C.own, { label: { show: true, position: 'outside', color: C['ink-2'], fontSize: 10.5, fontWeight: 600, formatter: (p) => F(p.value, 0) } }), avgLine(serie(dd => avg(dd.dn_pn)))] });
-  // caja de cada filial antes de que el simulador la cubra con deuda de corto plazo
-  document.getElementById('h_caja').textContent = `Caja antes de la deuda de corto plazo año ${y}`;
-  const regs = ['US', 'CN', 'EU'], nombres = ['EE.UU.', 'China', 'Europa'];
-  const cierre = regs.map(r => M(d.caja_reg[r][T])), deuda = regs.map(r => M(d.dcp_reg[r][T]));
-  const antes = cierre.map((c, i) => c - deuda[i]);
-  set('c_caja', { ...anim, textStyle: { ...font, color: C['ink-2'] }, grid: { left: 8, right: 64, top: 20, bottom: 30, containLabel: true },
-    tooltip: { trigger: 'item', ...ttBox(), formatter: (p) => { const i = p.dataIndex; return `<b>${nombres[i]}</b><br>Caja al cierre <b>${F(cierre[i], 0)} M</b><br>Deuda de corto plazo <b>${F(deuda[i], 0)} M</b><br>Caja antes de la deuda <b>${F(antes[i], 0)} M</b>`; } },
-    xAxis: { type: 'value', name: 'USD millones', nameLocation: 'middle', nameGap: 26, nameTextStyle: { color: C.muted, fontSize: 11 }, splitLine: { lineStyle: { color: C.grid } }, axisLabel: { color: C.muted, fontSize: 11, formatter: v => F(v, 0) } },
-    yAxis: { type: 'category', data: nombres, inverse: true, axisLine: { onZero: true, lineStyle: { color: C.axis } }, axisTick: { show: false }, axisLabel: { color: C.ink, fontSize: 12, fontWeight: 600 } },
-    series: [{ type: 'bar', name: 'Caja antes de la deuda', barMaxWidth: 26, animationDelay: delay,
-      data: antes.map(v => ({ value: v, itemStyle: { color: v < 0 ? C.bad : C.own, borderRadius: v < 0 ? [5, 0, 0, 5] : [0, 5, 5, 0] } })),
-      label: { show: true, position: 'outside', color: C.ink, fontSize: 12, fontWeight: 700, formatter: (p) => F(p.value, 0) } }] });
+  // caja de cada filial antes de que el simulador la cubra con deuda de corto plazo, año por año
+  const regs = ['US', 'CN', 'EU'], nombres = ['EE.UU.', 'China', 'Europa'], colores = [C.t1, C.t3, C.t4];
+  const cierre = regs.map(r => serie(dd => M(dd.caja_reg[r][T]))), deuda = regs.map(r => serie(dd => M(dd.dcp_reg[r][T])));
+  const antes = cierre.map((c, j) => c.map((v, i) => v - deuda[j][i]));
+  set('c_caja', { ...base(),
+    tooltip: { ...base().tooltip, formatter: (ps) => { const i = ps[0].dataIndex; return `<b>${X[i]}</b><br>` + regs.map((_, j) =>
+      `${dot(antes[j][i] < 0 ? C.bad : colores[j])}${nombres[j]} <b>${F(antes[j][i], 0)} M</b> <span style="color:${C.muted}">(caja ${F(cierre[j][i], 0)} − deuda CP ${F(deuda[j][i], 0)})</span>`).join('<br>'); } },
+    legend: { ...base().legend, data: nombres },
+    xAxis: xCat(X), yAxis: yVal('USD millones'),
+    series: regs.map((_, j) => bar(nombres[j], antes[j].map(v => ({ value: v, itemStyle: { color: v < 0 ? C.bad : colores[j], borderRadius: v < 0 ? [0, 0, 5, 5] : [5, 5, 0, 0] } })), colores[j], { barMaxWidth: 16 })) });
 }
 
 seccion({ id: 'financiamiento', vista: 'panel', render: financiamiento });

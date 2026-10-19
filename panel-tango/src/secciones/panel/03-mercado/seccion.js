@@ -26,23 +26,36 @@ function mercado() {
       emphasis: { scale: 1.35, itemStyle: { borderColor: C.ink, borderWidth: 2.5 } },
       animationDelay: () => j * 70 })) });
 
-  document.getElementById('h_msseg').textContent = `Market share por segmento año ${y}`;
+  // market share por segmento: siempre el último año con informe, no sigue al selector de año
+  const dl = RD[LAST];
+  document.getElementById('h_msseg').textContent = `Market share por segmento año ${LAST}`;
   const segs = [];
-  for (const r of ['US','CN','EU']) for (const tt of Object.keys(TEC)) { const m = d.seg[r][tt].ms; if (m.filter(v => v > 0).length >= 2) segs.push({ r, tt, m }); }
+  for (const r of ['US','CN','EU']) for (const tt of Object.keys(TEC)) { const m = dl.seg[r][tt].ms; if (m.filter(v => v > 0).length >= 2) segs.push({ r, tt, m }); }
   set('c_msseg', { ...base(), tooltip: { ...base().tooltip, ...tip(1, '%') },
-    xAxis: { ...xCat(segs.map(o => REG[o.r] + '\n' + TEC[o.tt]), ''), axisLabel: { color: C.muted, fontSize: 10, interval: 0 } }, yAxis: yVal('%'),
+    xAxis: { ...xCat(segs.map(o => REG[o.r] + '\n' + TEC[o.tt]), ''), axisLabel: { color: C.muted, fontSize: 10, interval: 0 } }, yAxis: yVal('% de market share'),
     series: [
       bar('TANGO', segs.map(o => o.m[T]), C.tango, { label: lblTop(1) }),
       bar('Líder', segs.map(o => Math.max(...o.m)), C.avg, { itemStyle: { color: grad(C.avg, .55, .4), borderRadius: [5,5,0,0] } }),
       line('Promedio', segs.map(o => avg(o.m.filter(v => v > 0))), C.ink, { symbol: 'rect', symbolSize: [20, 2.5], lineStyle: { opacity: 0 }, itemStyle: { color: C.ink }, smooth: false }),
     ] });
-  // costo por unidad vendida: TANGO contra el rango y el promedio del mercado
-  bandChart('c_costo', (r, k) => costoU(RD[r], k), { d: 0, yName: 'USD por unidad', yOpts: { scale: true } });
+  // costo por unidad vendida: TANGO contra el rango y el promedio del mercado, por mercado y tecnología
+  // costos totales del segmento (miles USD) ÷ unidades vendidas (miles) = USD por unidad
+  const regs = st.costreg === 'T' ? ['US', 'CN', 'EU'] : [st.costreg];
+  const tecs = st.costtec === 'T' ? TEC_COSTO : [st.costtec];
+  bandChart('c_costo', (r, k) => {
+    let c = 0, u = 0;
+    for (const rr of regs) for (const tt of tecs) { const s = RD[r].seg[rr][tt], v = s.ventas[k] || 0; if (v > 0 && s.costo[k] != null) { c += s.costo[k]; u += v; } }
+    return u ? c / u : null;
+  }, { d: 0, yName: 'USD por unidad', yOpts: { scale: true } });
 }
+const TEC_COSTO = ['comb', 'hib'];
 
 function fixTec() { if (!segOk(st.reg, st.tec)) st.tec = Object.keys(TEC).find(t => segOk(st.reg, t)); }
-seccion({ id: 'mercado', vista: 'panel', render: mercado, init: fixTec,
+seccion({ id: 'mercado', vista: 'panel', render: mercado,
+  init: () => { fixTec(); if (!st.costreg) st.costreg = 'T'; if (!st.costtec) st.costtec = 'T'; },
   controles: () => {
+    segBtns('costreg', [['T', 'Todos'], ['US', 'EE.UU.'], ['CN', 'China'], ['EU', 'Europa']], 'costreg', () => { controls(); mercado(); });
+    segBtns('costtec', [['T', 'Ambas'], ...TEC_COSTO.map(t => [t, TEC[t]])], 'costtec', () => { controls(); mercado(); });
     segBtns('f_reg', ['US','CN','EU'].map(r => [r, REG[r]]), 'reg', () => { fixTec(); controls(); mercado(); });
     segBtns('f_tec', Object.keys(TEC).filter(t => ['US','CN','EU'].some(r => segOk(r, t))).map(t => [t, TEC[t], !segOk(st.reg, t)]), 'tec', () => { controls(); mercado(); });
   } });

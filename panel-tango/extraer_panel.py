@@ -71,11 +71,15 @@ def ronda(path):
     base = {"US": dict(p=[335, 342, 349, 356], ms=[363, 364, 365, 366], mst=367),
             "CN": dict(p=[373, 380, 387, 394], ms=[401, 402, 403, 404], mst=405),
             "EU": dict(p=[411, 418, 425, 432], ms=[439, 440, 441, 442], mst=443)}
+    # costos totales del segmento (miles USD) del "Desglose de margen por tec": fila de ingresos + 7
+    ing_fila = {"US": dict(zip(TEC, [927, 943, 959, 975])), "CN": dict(zip(TEC, [994, 1010, 1026, 1042])),
+                "EU": dict(zip(TEC, [1061, 1077, 1093, 1109]))}
     d["seg"] = {}
     for rg, b in base.items():
         d["seg"][rg] = {}
         for t, p, ms in zip(TEC, b["p"], b["ms"]):
-            d["seg"][rg][t] = dict(precio=R(p), carac=R(p + 1), ventas=R(p + 3), demanda=R(p + 4), ms=R(ms))
+            d["seg"][rg][t] = dict(precio=R(p), carac=R(p + 1), ventas=R(p + 3), demanda=R(p + 4), ms=R(ms),
+                                   costo=R(ing_fila[rg][t] + 7))
         d["seg"][rg]["ms_total"] = R(b["mst"])
     # ---- operaciones
     d["prod_int"] = {"US": dict(zip(TEC, [R(i) for i in (604, 605, 606, 607)])), "CN": dict(zip(TEC, [R(i) for i in (610, 611, 612, 613)]))}

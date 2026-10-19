@@ -65,8 +65,11 @@ function accionista() {
     series: [bar('TANGO', serie(dd => dd.eps[T] < 0 ? { value: dd.eps[T], itemStyle: { color: C.bad, borderRadius: [0, 0, 5, 5] } } : dd.eps[T]), C.own, { label: lblTop(2) }), avgLine(serie(dd => avg(dd.eps)))] });
   bandChart('c_cap_m', (r, k) => MM(RD[r].cap[k]), { d: 1, yName: 'USD miles de M' });
   const rl = (n, f, c, sym, w, dash) => line(n, serie((dd, r) => f(r)), c, { symbol: sym, lineStyle: { width: w, color: c, type: dash || 'solid' }, endLabel: endLbl((p) => n + ' ' + F(p.value, 1)), labelLayout: { moveOverlap: 'shiftY' } });
-  set('c_rent', { ...base({ grid: { right: 86 } }), tooltip: lineTT(tip(1, '%')), xAxis: xCat(X), yAxis: yVal('%'),
-    series: [rl('ROA', r => roa(r, T), C.t3, 'triangle', 2, [5, 3]), { ...rl('ROE', r => RD[r].roe[T], C.t1, 'circle', 3), areaStyle: areaGrad(C.t2) }, rl('ROS', r => RD[r].ros[T], C.t2, 'rect', 2), rl('ROCE', r => RD[r].roce[T], C.t1, 'diamond', 2, [2, 3])] });
+  // sin relleno bajo el ROE (exageraba el pozo del año 4) y con el ROE promedio del mercado de referencia:
+  // muestra que la rentabilidad cayó en toda la industria desde el año 2 y que TANGO quedó arriba del promedio en los años 5 y 6
+  set('c_rent', { ...base({ grid: { right: 86 } }), tooltip: lineTT(tip(1, '%')), xAxis: xCat(X), yAxis: yVal('%', { min: (v) => Math.floor(Math.min(0, v.min)) }),
+    series: [rl('ROA', r => roa(r, T), C.t3, 'triangle', 2, [5, 3]), rl('ROE', r => RD[r].roe[T], C.t1, 'circle', 3), rl('ROS', r => RD[r].ros[T], C.t2, 'rect', 2), rl('ROCE', r => RD[r].roce[T], C.t1, 'diamond', 2, [2, 3]),
+      avgLine(serie(dd => avg(dd.roe)), 'ROE promedio mercado')] });
 }
 
 seccion({ id: 'accionista', vista: 'panel', render: accionista });
